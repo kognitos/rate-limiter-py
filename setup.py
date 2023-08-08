@@ -14,6 +14,6 @@ setup(name='rate-limiter-py',
     download_url='https://github.com/lifeomic/rate-limiter-py/archive/0.3.0.tar.gz',
     packages=find_packages(),
     license='MIT',
-    python_requires='>=3.6.0',
+    python_requires='>=3.9.0',
     install_requires=requirements
 )

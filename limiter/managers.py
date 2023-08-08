@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
-from future.utils import raise_from
 from limiter.clients import dynamodb
 from limiter.exceptions import CapacityExhaustedException, ReservationNotFoundException, ThrottlingException,\
                                RateLimiterException
@@ -98,9 +97,9 @@ class BaseTokenManager:
                 error_code = e.response['Error']['Code']
                 if error_code in ('ProvisionedThroughputExceededException', 'TooManyRequestsException'):
                     message = 'Throttled getting limit on {} for account {}'.format(self.resource_name, account_id)
-                    raise_from(ThrottlingException(message), e)
+                    raise ThrottlingException(message) from e
             message = 'Failed to get limit on {} for account {}'.format(self.resource_name, account_id)
-            raise_from(RateLimiterException(message), e)
+            raise RateLimiterException(message) from e
 
         if result[LIMIT] <= 0:
             message = 'Account {} has not been allocated any capacity for {}'.format(account_id, self.resource_name)
@@ -217,7 +216,7 @@ class FungibleTokenManager(BaseTokenManager):
                     raise CapacityExhaustedException(message)
                 if error_code in ('ProvisionedThroughputExceededException', 'TooManyRequestsException'):
                     message = 'Throttled by getting limit on {} for account {}'.format(self.resource_name, account_id)
-                    raise_from(ThrottlingException(message), e)
+                    raise ThrottlingException(message) from e
             raise
 
     def _refill_bucket_tokens(self, account_id, tokens, refill_time):
